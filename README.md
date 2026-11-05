@@ -24,7 +24,7 @@ These are **illustrative UI previews based on the frontend layout**, not verifie
 - Fixed-damage attack sequences, where overkill on a single defender does not spill into the next model.
 - Exact probability distribution of casualties, average allocated damage, wipe chance and expected unsaved attacks.
 - Responsive React UI with two entirely fictional examples.
-- Minimal ASP.NET Core API and xUnit tests.
+- ASP.NET Core MVC API controllers and xUnit/unit + HTTP integration tests.
 - No accounts, database, telemetry or deployment credentials.
 
 ## Quick start
@@ -56,6 +56,8 @@ curl -X POST http://localhost:5080/api/analyse \
   -d '{"attack":{"attacks":10,"hitOn":3,"strength":5,"armourPenetration":-1,"damage":2},"defender":{"toughness":5,"armourSave":3,"invulnerableSave":null,"woundsPerModel":3,"modelCount":5}}'
 ```
 
+When running the API in the Development environment, OpenAPI JSON is available at `http://localhost:5080/openapi/v1.json` (this project does not bundle a Swagger UI).
+
 ### Tests
 
 ```bash
@@ -78,7 +80,7 @@ All attackers are independent and identical. This is **not a full combat-rules e
 ## Structure
 
 - `src/CombatProbabilityLab.Core/` — pure C# probability engine and input records.
-- `src/CombatProbabilityLab.Api/` — minimal ASP.NET Core API and local-only CORS defaults.
+- `src/CombatProbabilityLab.Api/` — ASP.NET Core MVC controllers, an analysis service, local-only CORS defaults and development OpenAPI.
 - `web/` — React 19 / TypeScript / Vite user interface.
 - `tests/` — xUnit unit tests.
 - `docs/PUBLISHING.md` — separate-public-repository release checklist.
