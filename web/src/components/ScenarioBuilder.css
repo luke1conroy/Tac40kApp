@@ -1,0 +1,176 @@
+/* Scenario form and field styling. */
+.preset-row {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:24px;
+  flex-wrap:wrap;
+}
+
+.preset-row span {
+  font-weight:700;
+  color:#8091a9;
+  letter-spacing:.1em;
+  font-size:11px;
+  margin-right:8px;
+}
+
+.preset-row button {
+  border:1px solid #3b4c61;
+  background:#192435;
+  color:#dce5f1;
+  border-radius:9px;
+  padding:10px 16px;
+}
+
+.preset-row button:hover {
+  border-color:#d6ad70;
+}
+
+.workspace {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
+
+.panel {
+  background:#192435;
+  border:1px solid #2c3a4e;
+  border-radius:16px;
+  padding:28px;
+}
+
+.panel-heading {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:25px;
+}
+
+.number {
+  display:grid;
+  place-items:center;
+  border:1px solid #556680;
+  color:#d8b075;
+  border-radius:10px;
+  width:43px;
+  height:43px;
+  font-weight:700;
+}
+
+.panel h2 {
+  margin:0 0 4px;
+  font-size:20px;
+}
+
+.panel p {
+  margin:0;
+  color:#91a2b8;
+  font-size:13px;
+}
+
+.fields {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:19px;
+}
+
+.field {
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  color:#b5c3d5;
+  font-size:12px;
+  font-weight:600;
+}
+
+.field input,
+.field select {
+  width:100%;
+  border:1px solid #43536b;
+  border-radius:9px;
+  padding:12px 13px;
+  background:#121c2b;
+  color:#fff;
+  min-height:46px;
+}
+
+.field input:focus,
+.field select:focus {
+  outline:2px solid #c7a06a;
+  outline-offset:1px;
+}
+
+.run-row {
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  border:1px solid #38485f;
+  border-radius:14px;
+  background:#1c2b3d;
+  padding:24px 28px;
+}
+
+.run-row strong {
+  font-size:16px;
+}
+
+.run-row p {
+  color:#9fafc4;
+  font-size:13px;
+  margin:5px 0 0;
+}
+
+.run {
+  border:0;
+  border-radius:10px;
+  background:#e9bb75;
+  color:#151d29;
+  min-width:225px;
+  padding:15px 20px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.07em;
+}
+
+.run:hover {
+  background:#f3cc90;
+}
+
+.run:disabled {
+  opacity:.6;
+  cursor:wait;
+}
+
+@media(max-width:780px) {
+.workspace {
+  grid-template-columns:1fr;
+}
+}
+
+@media(max-width:780px) {
+.run-row {
+  flex-direction:column;
+  align-items:stretch;
+}
+}
+
+@media(max-width:780px) {
+.run {
+  width:100%;
+}
+}
+
+@media(max-width:780px) {
+.panel {
+  padding:20px;
+}
+}
+
+@media(max-width:390px) {
+.fields {
+  grid-template-columns:1fr;
+}
+}
