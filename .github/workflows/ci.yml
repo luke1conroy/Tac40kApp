@@ -24,5 +24,8 @@ jobs:
       - name: Frontend build
         working-directory: web
         run: npm run build
+      - name: Frontend component tests
+        working-directory: web
+        run: npm run test
       - name: Publication boundary checks
         run: python3 scripts/check_publication.py
