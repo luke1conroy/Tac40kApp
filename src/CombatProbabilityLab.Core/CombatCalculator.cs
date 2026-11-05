@@ -14,7 +14,12 @@ public sealed record CombatResult(
     double ExpectedAllocatedDamage,
     double ExpectedCasualties,
     double WipeProbability,
-    IReadOnlyList<ProbabilityPoint> CasualtyDistribution);
+    IReadOnlyList<ProbabilityPoint> CasualtyDistribution,
+    // A modal casualty count is an integer, unlike the average number of casualties.
+    int MostLikelyCasualties,
+    double AtLeastOneCasualtyProbability,
+    double ExpectedSurvivors,
+    double ExpectedWastedDamage);
 
 /// <summary>
 /// Exact probability model for identical, independent attacks against identical defenders.
@@ -57,16 +62,27 @@ public static class CombatCalculator
             allocatedExpectation += successes[unsaved] * allocated;
         }
 
+        // Complete all computations before constructing the API result.
+        // Invalid input exceptions deliberately propagate to the API boundary.
+        var expectedUnsavedHits = attack.Attacks * unsavedProbability;
+        var expectedRawDamage = expectedUnsavedHits * attack.Damage;
+        var summary = CombatOutcomeSummarizer.Summarize(
+            casualties, defender.ModelCount, expectedRawDamage, allocatedExpectation);
+
         return new CombatResult(
             woundOn,
             effectiveSaveOn,
             unsavedProbability,
-            attack.Attacks * unsavedProbability,
-            attack.Attacks * unsavedProbability * attack.Damage,
+            expectedUnsavedHits,
+            expectedRawDamage,
             allocatedExpectation,
-            casualties.Select((probability, count) => (double)count * probability).Sum(),
-            casualties[^1],
-            casualties.Select((probability, count) => new ProbabilityPoint(count, probability)).ToArray());
+            summary.ExpectedCasualties,
+            summary.WipeProbability,
+            summary.CasualtyDistribution,
+            summary.MostLikelyCasualties,
+            summary.AtLeastOneCasualtyProbability,
+            summary.ExpectedSurvivors,
+            summary.ExpectedWastedDamage);
     }
 
     private static void Validate(AttackInput attack, DefenderInput defender)
