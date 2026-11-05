@@ -45,7 +45,7 @@ No Windows `node_modules` folder is copied into Linux images; the frontend build
 The existing `.github/workflows/ci.yml` now has a `containers` job that depends on successful xUnit, Vite and publication-boundary checks. It:
 
 1. Builds both images from the current commit.
-2. Starts the app with Compose.
+2. Starts the app with Compose. The CI build uses `--provenance=false` when creating Docker-local images to avoid pushing a local attestation-bearing image index to GHCR; it does not change application source or runtime behavior.
 3. Runs `scripts/smoke_containers.py` against API health, React HTML, direct analysis and the Nginx reverse proxy.
 4. Stops the containers even when checks fail.
 5. **Only on successful pushes to `main`**, logs in to GHCR using the automatic `GITHUB_TOKEN` and pushes both images.
@@ -92,7 +92,7 @@ If you use SHA tags, edit **both** image tags in `compose.ghcr.yaml` to the same
 - **Frontend shows a gateway error:** Check `docker compose logs web api`; the Compose `api` service must be running and reachable from Nginx.
 - **Docker daemon unavailable:** Start Docker Desktop, ensure Linux-container mode is selected and retry `docker compose version`.
 - **Frontend changes not showing:** Rebuild with `docker compose up --build -d`. This is a static production build, so editing React source does not hot reload.
-- **GHCR package not found:** It is not created until a successful `main` workflow run; private visibility also requires a login.
+- **GHCR package not found or push denied:** It is not created until a successful `main` workflow run; private visibility also requires a login. If login succeeds but push is denied, check that the package is linked to this repository and grants it **Manage Actions access → Write**. The `packages: write` job permission alone cannot override another package's access controls.
 - **Tests fail:** Inspect the failing GitHub Actions job and `docker compose logs`; CI deliberately never publishes untested images.
 
 For a *publicly accessible* deployment, supply proper TLS/HTTPS, DNS, rate limiting and deployment secrets outside this repository. The Nginx configuration assumes the API container's hostname is `api` on the same Docker network; a separate managed hosting service needs an appropriate reverse-proxy upstream or separately configured API origin/CORS. An image in GHCR is **not** itself a hosted application.

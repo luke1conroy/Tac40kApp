@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build both production images
-        run: docker compose build --pull
+        run: docker compose build --pull --provenance=false
       - name: Start the composed application
         run: docker compose up --detach --no-build
       - name: Smoke test browser origin, API and reverse proxy
