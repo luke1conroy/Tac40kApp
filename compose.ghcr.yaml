@@ -1,0 +1,16 @@
+# Run the versioned images published by a successful CI push to main.
+# This does not build images locally and does not host the app on GitHub.
+services:
+  api:
+    image: ghcr.io/luke1conroy/tac40k-api:latest
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      - "127.0.0.1:5080:8080"
+
+  web:
+    image: ghcr.io/luke1conroy/tac40k-web:latest
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:5173:8080"

@@ -31,7 +31,33 @@ These are **screenshots of the running application** taken by Playwright against
 - ASP.NET Core MVC API controllers and xUnit/unit + HTTP integration tests.
 - No accounts, database, telemetry or deployment credentials.
 
-## Quick start
+## Docker quick start (recommended)
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine with Compose. From the repository root:
+
+```bash
+docker compose up --build -d
+```
+
+Open **http://localhost:5173**. The production React frontend is served by Nginx and proxies `/api` to the .NET container. Check the API at **http://localhost:5080/health**.
+
+```bash
+docker compose ps
+docker compose logs -f
+python3 scripts/smoke_containers.py  # optional: requires Python 3.10+
+docker compose down
+```
+
+Both ports are bound to `127.0.0.1` on your computer. GitHub Container Registry stores prebuilt Docker images but does not host a website. **Once images are published following a successful main-branch workflow**, run them locally without compiling:
+
+```bash
+docker compose -f compose.ghcr.yaml pull
+docker compose -f compose.ghcr.yaml up -d
+```
+
+See [Docker and GHCR documentation](docs/CONTAINERS.md) for details about image tags, CI, visibility, troubleshooting and deployment.
+
+## Native development without Docker
 
 Prerequisites: [.NET SDK 10](https://dotnet.microsoft.com/download) and [Node.js 22+](https://nodejs.org/).
 
@@ -87,7 +113,8 @@ All attackers are independent and identical. This is **not a full combat-rules e
 - `src/CombatProbabilityLab.Api/` — ASP.NET Core MVC controllers, an analysis service, local-only CORS defaults and development OpenAPI.
 - `web/` — React 19 / TypeScript / Vite UI with testable scenario/results components, feature-scoped CSS and Vitest tests.
 - `tests/` — xUnit unit tests.
-- `docs/PUBLISHING.md` — separate-public-repository release checklist.
+- `docs/PUBLISHING.md` — public-source and rights checklist.
+- `docs/CONTAINERS.md` — Docker Compose, GHCR and GitHub Actions instructions.
 
 ## Contributing and maintenance
 
