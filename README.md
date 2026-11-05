@@ -62,7 +62,7 @@ curl -X POST http://localhost:5080/api/analyse \
 
 ```bash
 dotnet test tests/CombatProbabilityLab.Tests
-cd web && npm run build
+cd web && npm run build && npm run test
 python3 scripts/check_publication.py
 ```
 
@@ -81,7 +81,7 @@ All attackers are independent and identical. This is **not a full combat-rules e
 
 - `src/CombatProbabilityLab.Core/` — pure C# probability engine and input records.
 - `src/CombatProbabilityLab.Api/` — minimal ASP.NET Core API and local-only CORS defaults.
-- `web/` — React 19 / TypeScript / Vite user interface.
+- `web/` — React 19 / TypeScript / Vite UI with focused scenario/results components, feature-specific CSS, and Vitest component tests.
 - `tests/` — xUnit unit tests.
 - `docs/PUBLISHING.md` — separate-public-repository release checklist.
 
