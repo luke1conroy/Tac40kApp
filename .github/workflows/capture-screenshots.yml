@@ -1,0 +1,50 @@
+name: Capture authentic application screenshots
+on:
+  push:
+    branches: [fix/review-feedback-and-live-screenshots]
+    paths:
+      - '.github/workflows/capture-screenshots.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install frontend packages
+        working-directory: web
+        run: npm install --no-audit --no-fund
+      - name: Install browser
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+      - name: Start the real API and frontend
+        run: |
+          nohup dotnet run --project src/CombatProbabilityLab.Api --urls http://127.0.0.1:5080 > /tmp/tac40k-api.log 2>&1 &
+          cd web
+          nohup npm run dev -- --host 127.0.0.1 > /tmp/tac40k-vite.log 2>&1 &
+      - name: Wait for API and Vite
+        run: |
+          curl --fail --silent --show-error --retry 40 --retry-connrefused --retry-delay 2 http://127.0.0.1:5080/health
+          curl --fail --silent --show-error --retry 40 --retry-connrefused --retry-delay 2 http://127.0.0.1:5173/
+      - name: Capture desktop and mobile screenshots
+        working-directory: web
+        run: node scripts/capture-previews.mjs
+      - name: Commit verified images to the review branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/screenshots/*.png
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: capture running application screenshots [skip ci]"
+            git push origin HEAD:refs/heads/fix/review-feedback-and-live-screenshots
+          fi

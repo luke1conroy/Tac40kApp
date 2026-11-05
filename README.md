@@ -8,15 +8,17 @@ This is a deliberately **separate, reduced public edition** created from lessons
 
 ## Interface previews
 
-These are **illustrative UI previews based on the frontend layout**, not verified screenshots of a running app. The sample results use fictional profiles. [About these previews](docs/previews/README.md).
+These are **screenshots of the running application** taken by Playwright against the React frontend and the .NET API in a clean CI environment. They use the built-in fictional profiles, not game-specific data. [Screenshot capture notes](docs/previews/README.md).
 
 | Scenario builder | Analysis results |
 |:--:|:--:|
-| ![Fictional attacking and defending scenario UI](docs/previews/scenario-builder.svg) | ![Outcome metrics and casualty probability distribution](docs/previews/analysis-results.svg) |
+| ![Running application: fictional attack and defender inputs](docs/screenshots/scenario-builder.png) | ![Running application: most likely kills, expected damage and casualty probability](docs/screenshots/analysis-results.png) |
 
-**Responsive layout**
+**Mobile layout (390 px viewport)**
 
-<img src="docs/previews/mobile-layout.svg" alt="Illustrative mobile layout of the Combat Probability Lab" width="270" />
+| Scenario inputs | Analysis results |
+|:--:|:--:|
+| <img src="docs/screenshots/mobile-scenario.png" alt="Running application on mobile: input form" width="290" /> | <img src="docs/screenshots/mobile-results.png" alt="Running application on mobile: outcome summary" width="290" /> |
 
 ## What works
 
@@ -64,7 +66,7 @@ When running the API in the Development environment, OpenAPI JSON is available a
 
 ```bash
 dotnet test tests/CombatProbabilityLab.Tests
-cd web && npm run build
+cd web && npm run build && npm run test
 python3 scripts/check_publication.py
 ```
 
@@ -83,7 +85,7 @@ All attackers are independent and identical. This is **not a full combat-rules e
 
 - `src/CombatProbabilityLab.Core/` — pure C# probability engine and input records.
 - `src/CombatProbabilityLab.Api/` — ASP.NET Core MVC controllers, an analysis service, local-only CORS defaults and development OpenAPI.
-- `web/` — React 19 / TypeScript / Vite user interface.
+- `web/` — React 19 / TypeScript / Vite UI with testable scenario/results components, feature-scoped CSS and Vitest tests.
 - `tests/` — xUnit unit tests.
 - `docs/PUBLISHING.md` — separate-public-repository release checklist.
 
