@@ -1,0 +1,21 @@
+# Local production-style run. Ports are loopback-only to avoid LAN exposure.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/CombatProbabilityLab.Api/Dockerfile
+    image: tac40k-api:local
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      - "127.0.0.1:5080:8080"
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    image: tac40k-web:local
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:5173:8080"

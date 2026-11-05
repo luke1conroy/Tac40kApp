@@ -1,0 +1,24 @@
+# Keep local builds, dependencies, credentials and Git history out of Docker contexts.
+.git
+.github
+.vscode
+.idea
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/TestResults
+**/coverage
+docs
+tests
+scripts
+*.md
+.env
+**/.env
+**/.env.*
+**/appsettings.*.Local.json
+**/secrets.json
+**/*.pem
+**/*.pfx
+**/*.p12
+**/*.key
