@@ -62,25 +62,27 @@ public static class CombatCalculator
             allocatedExpectation += successes[unsaved] * allocated;
         }
 
-        var expectedCasualties = casualties.Select((probability, count) => count * probability).Sum();
-        var expectedRawDamage = attack.Attacks * unsavedProbability * attack.Damage;
-        // Array.IndexOf chooses the lower casualty count when multiple outcomes tie.
-        var mostLikelyCasualties = Array.IndexOf(casualties, casualties.Max());
+        // Complete all computations before constructing the API result.
+        // Invalid input exceptions deliberately propagate to the API boundary.
+        var expectedUnsavedHits = attack.Attacks * unsavedProbability;
+        var expectedRawDamage = expectedUnsavedHits * attack.Damage;
+        var summary = CombatOutcomeSummarizer.Summarize(
+            casualties, defender.ModelCount, expectedRawDamage, allocatedExpectation);
 
         return new CombatResult(
             woundOn,
             effectiveSaveOn,
             unsavedProbability,
-            attack.Attacks * unsavedProbability,
+            expectedUnsavedHits,
             expectedRawDamage,
             allocatedExpectation,
-            expectedCasualties,
-            casualties[^1],
-            casualties.Select((probability, count) => new ProbabilityPoint(count, probability)).ToArray(),
-            mostLikelyCasualties,
-            1d - casualties[0],
-            defender.ModelCount - expectedCasualties,
-            Math.Max(0d, expectedRawDamage - allocatedExpectation));
+            summary.ExpectedCasualties,
+            summary.WipeProbability,
+            summary.CasualtyDistribution,
+            summary.MostLikelyCasualties,
+            summary.AtLeastOneCasualtyProbability,
+            summary.ExpectedSurvivors,
+            summary.ExpectedWastedDamage);
     }
 
     private static void Validate(AttackInput attack, DefenderInput defender)
