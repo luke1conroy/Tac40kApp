@@ -23,6 +23,8 @@ These are **illustrative UI previews based on the frontend layout**, not verifie
 - Generic D6 hit, wound and armour-save resolution.
 - Fixed-damage attack sequences, where overkill on a single defender does not spill into the next model.
 - Exact probability distribution of casualties, average allocated damage, wipe chance and expected unsaved attacks.
+- Plain-language outcome summary: most likely number of kills, chance of at least one kill, average survivors and wasted damage.
+- The **most likely kill count** is the most probable integer outcome, not the average rounded to an integer. Ties prefer the lower count.
 - Responsive React UI with two entirely fictional examples.
 - Minimal ASP.NET Core API and xUnit tests.
 - No accounts, database, telemetry or deployment credentials.

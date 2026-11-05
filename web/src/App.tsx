@@ -73,13 +73,13 @@ export function App() {
   function attackField(label: string, key: keyof Attack, min: number, max: number) {
     return <label className="field" key={key}><span>{label}</span>
       <input type="number" min={min} max={max} step={1} value={attack[key]}
-        onChange={e => setAttack(old => ({ ...old, [key]: e.currentTarget.valueAsNumber }))} required />
+        onChange={e => { setAttack(old => ({ ...old, [key]: e.currentTarget.valueAsNumber })); setResult(null); }} required />
     </label>;
   }
   function defenderField(label: string, key: Exclude<keyof Defender, 'invulnerableSave'>, min: number, max: number) {
     return <label className="field" key={key}><span>{label}</span>
       <input type="number" min={min} max={max} step={1} value={defender[key]}
-        onChange={e => setDefender(old => ({ ...old, [key]: e.currentTarget.valueAsNumber }))} required />
+        onChange={e => { setDefender(old => ({ ...old, [key]: e.currentTarget.valueAsNumber })); setResult(null); }} required />
     </label>;
   }
   return <div className="page">
@@ -115,7 +115,7 @@ export function App() {
             {defenderField('Toughness', 'toughness', 1, 1000)}
             {defenderField('Armour save (2–7)', 'armourSave', 2, 7)}
             <label className="field"><span>Alternate save (optional)</span>
-              <select value={defender.invulnerableSave ?? 'none'} onChange={e => setDefender(old => ({ ...old, invulnerableSave: e.currentTarget.value === 'none' ? null : Number(e.currentTarget.value) }))}>
+              <select value={defender.invulnerableSave ?? 'none'} onChange={e => { setDefender(old => ({ ...old, invulnerableSave: e.currentTarget.value === 'none' ? null : Number(e.currentTarget.value) })); setResult(null); }}>
                 <option value="none">None</option>{[2,3,4,5,6].map(x => <option key={x} value={x}>{x}+</option>)}
               </select>
             </label>
