@@ -14,7 +14,12 @@ public sealed record CombatResult(
     double ExpectedAllocatedDamage,
     double ExpectedCasualties,
     double WipeProbability,
-    IReadOnlyList<ProbabilityPoint> CasualtyDistribution);
+    IReadOnlyList<ProbabilityPoint> CasualtyDistribution,
+    // A modal casualty count is an integer, unlike the average number of casualties.
+    int MostLikelyCasualties,
+    double AtLeastOneCasualtyProbability,
+    double ExpectedSurvivors,
+    double ExpectedWastedDamage);
 
 /// <summary>
 /// Exact probability model for identical, independent attacks against identical defenders.
@@ -57,16 +62,25 @@ public static class CombatCalculator
             allocatedExpectation += successes[unsaved] * allocated;
         }
 
+        var expectedCasualties = casualties.Select((probability, count) => count * probability).Sum();
+        var expectedRawDamage = attack.Attacks * unsavedProbability * attack.Damage;
+        // Array.IndexOf chooses the lower casualty count when multiple outcomes tie.
+        var mostLikelyCasualties = Array.IndexOf(casualties, casualties.Max());
+
         return new CombatResult(
             woundOn,
             effectiveSaveOn,
             unsavedProbability,
             attack.Attacks * unsavedProbability,
-            attack.Attacks * unsavedProbability * attack.Damage,
+            expectedRawDamage,
             allocatedExpectation,
-            casualties.Select((probability, count) => (double)count * probability).Sum(),
+            expectedCasualties,
             casualties[^1],
-            casualties.Select((probability, count) => new ProbabilityPoint(count, probability)).ToArray());
+            casualties.Select((probability, count) => new ProbabilityPoint(count, probability)).ToArray(),
+            mostLikelyCasualties,
+            1d - casualties[0],
+            defender.ModelCount - expectedCasualties,
+            Math.Max(0d, expectedRawDamage - allocatedExpectation));
     }
 
     private static void Validate(AttackInput attack, DefenderInput defender)

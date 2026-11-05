@@ -12,6 +12,10 @@ type Result = {
   expectedCasualties: number;
   wipeProbability: number;
   casualtyDistribution: { count: number; probability: number }[];
+  mostLikelyCasualties: number;
+  atLeastOneCasualtyProbability: number;
+  expectedSurvivors: number;
+  expectedWastedDamage: number;
 };
 const presets = {
   balanced: {
@@ -124,18 +128,33 @@ export function App() {
       {error && <div role="alert" className="alert">{error} <span>Make sure the .NET API is running on port 5080.</span></div>}
       {result ? <section className="results" aria-live="polite">
         <div className="results-heading"><div><p className="eyebrow">EXACT RESULTS</p><h2>Outcome breakdown</h2></div><span className="pill">No simulation variance</span></div>
-        <div className="metrics">
-          <div className="metric"><small>EXPECTED CASUALTIES</small><strong>{numberFormat(result.expectedCasualties)}</strong><span>Models removed, on average</span></div>
-          <div className="metric"><small>FULL WIPE CHANCE</small><strong>{pct(result.wipeProbability)}</strong><span>Probability all models are removed</span></div>
-          <div className="metric"><small>ALLOCATED DAMAGE</small><strong>{numberFormat(result.expectedAllocatedDamage)}</strong><span>Excludes overkill and post-wipe attacks</span></div>
-          <div className="metric"><small>UNSAVED HITS</small><strong>{numberFormat(result.expectedUnsavedHits)}</strong><span>From {pct(result.unsavedHitProbability)} chance per attack</span></div>
+        <div className="outcome-hero">
+          <div className="outcome-main">
+            <span className="eyebrow">MOST LIKELY OUTCOME</span>
+            <strong>{result.mostLikelyCasualties} {result.mostLikelyCasualties === 1 ? 'model killed' : 'models killed'}</strong>
+            <p>This is the most probable whole-number outcome, <em>not</em> the rounded average.</p>
+          </div>
+          <div className="outcome-context">
+            <span>Chance of at least one kill</span>
+            <strong>{pct(result.atLeastOneCasualtyProbability)}</strong>
+            <span>Average models remaining</span>
+            <strong>{numberFormat(result.expectedSurvivors)} of {defender.modelCount}</strong>
+          </div>
         </div>
-        <div className="distribution"><h3>Casualty probability distribution</h3><p>Exactly how likely each possible model-loss count is.</p>
-          <div className="bars" role="list">{result.casualtyDistribution.map(point => <div className="bar-row" role="listitem" key={point.count}>
-            <span className="bar-label">{point.count} {point.count === 1 ? 'model' : 'models'}</span>
+        <div className="metrics" aria-label="Combat outcome summary">
+          <div className="metric"><small>AVERAGE KILLS</small><strong>{numberFormat(result.expectedCasualties)}</strong><span>Expected models removed, across all outcomes</span></div>
+          <div className="metric"><small>FULL WIPE CHANCE</small><strong>{pct(result.wipeProbability)}</strong><span>Probability every defending model is removed</span></div>
+          <div className="metric"><small>ALLOCATED DAMAGE</small><strong>{numberFormat(result.expectedAllocatedDamage)}</strong><span>Damage that actually reduces defender wounds</span></div>
+          <div className="metric"><small>WASTED DAMAGE</small><strong>{numberFormat(result.expectedWastedDamage)}</strong><span>Overkill or hits after the target is destroyed</span></div>
+        </div>
+        <div className="distribution"><h3>How many models are killed?</h3>
+          <p>Chance of losing <strong>exactly</strong> this many models. Each row is one possible outcome.</p>
+          <div className="bars" role="list">{result.casualtyDistribution.map(point => <div className={point.count === result.mostLikelyCasualties ? 'bar-row bar-row-featured' : 'bar-row'} role="listitem" key={point.count}>
+            <span className="bar-label">{point.count} {point.count === 1 ? 'kill' : 'kills'}{point.count === result.mostLikelyCasualties && <span className="likely-marker">Most likely</span>}</span>
             <div className="bar-track"><div className="bar-fill" style={{ width: `${(point.probability * 100).toFixed(4)}%` }} /></div>
             <strong>{pct(point.probability)}</strong>
           </div>)}</div>
+          <p className="distribution-note">Expected unsaved attacks: {numberFormat(result.expectedUnsavedHits)} · Unsaved attack chance: {pct(result.unsavedHitProbability)}</p>
           <p className="fineprint">Wound roll needed: {result.woundOn}+ · Effective save: {result.effectiveSaveOn === 7 ? 'none' : `${result.effectiveSaveOn}+`} · Expected raw damage: {numberFormat(result.expectedRawDamage)}</p>
         </div>
       </section> : <div className="empty-state">Enter a matchup and run the analysis to see its exact casualty distribution.</div>}

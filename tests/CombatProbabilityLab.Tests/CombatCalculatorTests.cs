@@ -20,6 +20,10 @@ public sealed class CombatCalculatorTests
         Assert.Equal(0.25d, result.WipeProbability, 10);
         Assert.Equal(0.75d, result.CasualtyDistribution[0].Probability, 10);
         Assert.Equal(0.25d, result.CasualtyDistribution[1].Probability, 10);
+        Assert.Equal(0, result.MostLikelyCasualties);
+        Assert.Equal(0.25d, result.AtLeastOneCasualtyProbability, 10);
+        Assert.Equal(0.75d, result.ExpectedSurvivors, 10);
+        Assert.Equal(0d, result.ExpectedWastedDamage, 10);
     }
 
     [Fact]
@@ -30,6 +34,8 @@ public sealed class CombatCalculatorTests
         Assert.Equal(0d, result.WipeProbability);
         Assert.Equal(0.25d, result.ExpectedAllocatedDamage, 10);
         Assert.Equal(2.5d, result.ExpectedRawDamage, 10);
+        Assert.Equal(2.25d, result.ExpectedWastedDamage, 10);
+        Assert.Equal(2.75d, result.ExpectedSurvivors, 10);
     }
 
     [Fact]
@@ -38,6 +44,8 @@ public sealed class CombatCalculatorTests
         var result = CombatCalculator.Analyse(Basic(attacks: 2, wounds: 2));
         // Both unsaved hits required; P = (1/4)^2.
         Assert.Equal(0.0625d, result.WipeProbability, 10);
+        // An unsaved hit wounds the model, but does not necessarily kill it.
+        Assert.Equal(0.0625d, result.AtLeastOneCasualtyProbability, 10);
     }
 
     [Fact]
@@ -46,6 +54,10 @@ public sealed class CombatCalculatorTests
         var result = CombatCalculator.Analyse(Basic(attacks: 0));
         Assert.Equal(1d, result.CasualtyDistribution[0].Probability);
         Assert.Equal(0d, result.ExpectedRawDamage);
+        Assert.Equal(0, result.MostLikelyCasualties);
+        Assert.Equal(0d, result.AtLeastOneCasualtyProbability);
+        Assert.Equal(1d, result.ExpectedSurvivors);
+        Assert.Equal(0d, result.ExpectedWastedDamage);
     }
 
     [Fact]
@@ -54,6 +66,29 @@ public sealed class CombatCalculatorTests
         var result = CombatCalculator.Analyse(Basic(attacks: 200, models: 50, wounds: 2));
         Assert.Equal(1d, result.CasualtyDistribution.Sum(x => x.Probability), 8);
         Assert.All(result.CasualtyDistribution, x => Assert.InRange(x.Probability, 0d, 1d));
+    }
+
+    [Fact]
+    public void MostLikelyCasualtiesCanBeNonzeroAndNeedNotEqualRoundedMean()
+    {
+        var result = CombatCalculator.Analyse(new CombatRequest(
+            new AttackInput(1, 2, 10, 0, 1),
+            new DefenderInput(2, 7, null, 1, 3)));
+
+        Assert.Equal(1, result.MostLikelyCasualties);
+        Assert.Equal(25d / 36d, result.AtLeastOneCasualtyProbability, 10);
+        Assert.Equal(3d - 25d / 36d, result.ExpectedSurvivors, 10);
+    }
+
+    [Fact]
+    public void ExcessAttacksAfterWipeCountAsWastedDamage()
+    {
+        var result = CombatCalculator.Analyse(Basic(attacks: 2));
+
+        Assert.Equal(0.5d, result.ExpectedRawDamage, 10);
+        Assert.Equal(0.4375d, result.ExpectedAllocatedDamage, 10);
+        Assert.Equal(0.0625d, result.ExpectedWastedDamage, 10);
+        Assert.Equal(result.WipeProbability, result.AtLeastOneCasualtyProbability, 10);
     }
 
     [Fact]
