@@ -6,6 +6,18 @@
 
 This is a deliberately **separate, reduced public edition** created from lessons learned building a private tabletop-combat hobby project. It is **not** the complete original game-specific application, does **not** include any Warhammer/BSData catalogue or other third-party game profiles, and has no affiliation with any game publisher.
 
+## Interface previews
+
+These are **illustrative UI previews based on the frontend layout**, not verified screenshots of a running app. The sample results use fictional profiles. [About these previews](docs/previews/README.md).
+
+| Scenario builder | Analysis results |
+|:--:|:--:|
+| ![Fictional attacking and defending scenario UI](docs/previews/scenario-builder.svg) | ![Outcome metrics and casualty probability distribution](docs/previews/analysis-results.svg) |
+
+**Responsive layout**
+
+<img src="docs/previews/mobile-layout.svg" alt="Illustrative mobile layout of the Combat Probability Lab" width="270" />
+
 ## What works
 
 - Generic D6 hit, wound and armour-save resolution.
